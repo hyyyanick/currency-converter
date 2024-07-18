@@ -5,7 +5,7 @@
       matInput
       type="number"
       [(ngModel)]="amount"
-      (change)="updateConvertedAmount()"
+      (change)="onConvertAmount()"
       class="example-right-align"
       placeholder="0"
     />
@@ -25,10 +25,34 @@
   <div class="example-container">
     <mat-form-field>
       <mat-label>Fixed Rate</mat-label>
-      <input matInput type="number" [formControl]="fixedRate" required />
+      <input matInput type="number" [(ngModel)]="fixedRate" />
     </mat-form-field>
     <button mat-button (click)="setFixedRate()">Set Fixed Rate</button>
   </div>
+
+  @if (conversionHistory.length) {
+  <div>
+    <h3>Conversion History</h3>
+    <table>
+      <tr>
+        <th>Real Rate</th>
+        <th>Fixed Rate</th>
+        <th>Initial Value</th>
+        <th>Initial Currency</th>
+        <th>Converted Value</th>
+        <th>Converted Currency</th>
+      </tr>
+      <tr *ngFor="let entry of conversionHistory">
+        <td>{{ entry.realTimeRate }}</td>
+        <td>{{ entry.fixedRate }}</td>
+        <td>{{ entry.initialAmount }}</td>
+        <td>{{ entry.initialCurrency }}</td>
+        <td>{{ entry.convertedAmount }}</td>
+        <td>{{ entry.convertedCurrency }}</td>
+      </tr>
+    </table>
+  </div>
+  }
 </div>
 
 <p>Current exchange rate: 1 EUR = {{ currentRate$ | async }} USD</p>

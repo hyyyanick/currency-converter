@@ -7,6 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ConversionHistory } from '../interfaces/conversion-history.interface';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-converter',
@@ -19,6 +21,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatButtonModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatTableModule,
   ],
   templateUrl: './converter.component.html',
   styleUrl: './converter.component.scss',
@@ -27,8 +30,9 @@ export class ConverterComponent implements OnDestroy {
   amount: number = 0;
   convertedAmount: number = 0;
   isEuroToUSD: boolean = true;
+  conversionHistory: ConversionHistory[] = [];
 
-  readonly fixedRate = new FormControl('', []);
+  fixedRate: number | null = null;
 
   currentRate$: Observable<number>;
   subscription: Subscription;
@@ -38,6 +42,19 @@ export class ConverterComponent implements OnDestroy {
       .realTimeExchangeRate()
       .subscribe(() => this.updateConvertedAmount());
     this.currentRate$ = this.exchangeRateService.rate$;
+  }
+
+  displayedColumns: string[] = [
+    'realTimeRate',
+    'fixedRate',
+    'initialAmount',
+    'convertedAmount',
+  ];
+
+  onConvertAmount(): void {
+    this.updateConvertedAmount();
+    this.addHistory();
+    console.log(this.conversionHistory);
   }
 
   updateConvertedAmount() {
@@ -58,9 +75,24 @@ export class ConverterComponent implements OnDestroy {
   }
 
   setFixedRate() {
-    const fixedRate = this.fixedRate.value;
-    if (fixedRate) {
-      this.exchangeRateService.setRate(parseFloat(fixedRate));
+    if (this.fixedRate) {
+      this.exchangeRateService.setRate(this.fixedRate);
+    }
+  }
+
+  addHistory() {
+    const currentRate = this.exchangeRateService.getCurrentRate();
+    const history: ConversionHistory = {
+      realTimeRate: currentRate,
+      fixedRate: this.fixedRate,
+      initialAmount: this.amount,
+      initialCurrency: this.isEuroToUSD ? 'EUR' : 'USD',
+      convertedAmount: this.convertedAmount,
+      convertedCurrency: this.isEuroToUSD ? 'USD' : 'EUR',
+    };
+    this.conversionHistory.unshift(history);
+    if (this.conversionHistory.length > 5) {
+      this.conversionHistory.pop();
     }
   }
 
