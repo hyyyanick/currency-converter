@@ -9,14 +9,18 @@
       class="example-right-align"
       placeholder="0"
     />
-    <span matTextPrefix>$&nbsp;</span>
+    <span matTextPrefix>{{ isEuroToUSD ? "€" : "$" }} &nbsp;</span>
     <span matTextSuffix>.00</span>
   </mat-form-field>
 
   <div>
-    Converted Amount USD:
+    Converted Amount in {{ isEuroToUSD ? "USD" : "EUR" }}:
     {{ convertedAmount.toFixed(2) }}
   </div>
+
+  <button mat-button (click)="toggleCurrency()">
+    Switch to {{ isEuroToUSD ? "USD" : "EUR" }}
+  </button>
 </div>
 
 <p>Current exchange rate: 1 EUR = {{ currentRate$ | async }} USD</p>

@@ -25,18 +25,32 @@ import { FormsModule } from '@angular/forms';
 export class ConverterComponent {
   amount: number = 0;
   convertedAmount: number = 0;
+  isEuroToUSD: boolean = true;
+
   currentRate$: Observable<number>;
   subscription: Subscription;
 
   constructor(private exchangeRateService: ExchangeRateService) {
     this.subscription = this.exchangeRateService
       .realTimeExchangeRate()
-      .subscribe();
+      .subscribe(() => this.updateConvertedAmount());
     this.currentRate$ = this.exchangeRateService.rate$;
   }
 
   updateConvertedAmount() {
     const currentRate: number = this.exchangeRateService.getCurrentRate();
-    this.convertedAmount = this.amount * currentRate;
+    if (this.isEuroToUSD) {
+      this.convertedAmount = this.amount * currentRate;
+    } else {
+      this.convertedAmount = this.amount / currentRate;
+    }
+  }
+
+  toggleCurrency() {
+    this.isEuroToUSD = !this.isEuroToUSD;
+    const temp: number = this.amount;
+    this.amount = this.convertedAmount;
+    this.convertedAmount = temp;
+    this.updateConvertedAmount();
   }
 }
