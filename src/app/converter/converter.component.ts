@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { ExchangeRateService } from '../services/exchange-rate.service';
 import { CommonModule } from '@angular/common';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-converter',
@@ -18,14 +18,17 @@ import { FormsModule } from '@angular/forms';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './converter.component.html',
   styleUrl: './converter.component.scss',
 })
-export class ConverterComponent {
+export class ConverterComponent implements OnDestroy {
   amount: number = 0;
   convertedAmount: number = 0;
   isEuroToUSD: boolean = true;
+
+  readonly fixedRate = new FormControl('', []);
 
   currentRate$: Observable<number>;
   subscription: Subscription;
@@ -52,5 +55,16 @@ export class ConverterComponent {
     this.amount = this.convertedAmount;
     this.convertedAmount = temp;
     this.updateConvertedAmount();
+  }
+
+  setFixedRate() {
+    const fixedRate = this.fixedRate.value;
+    if (fixedRate) {
+      this.exchangeRateService.setRate(parseFloat(fixedRate));
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

@@ -21,6 +21,14 @@
   <button mat-button (click)="toggleCurrency()">
     Switch to {{ isEuroToUSD ? "USD" : "EUR" }}
   </button>
+
+  <div class="example-container">
+    <mat-form-field>
+      <mat-label>Fixed Rate</mat-label>
+      <input matInput type="number" [formControl]="fixedRate" required />
+    </mat-form-field>
+    <button mat-button (click)="setFixedRate()">Set Fixed Rate</button>
+  </div>
 </div>
 
 <p>Current exchange rate: 1 EUR = {{ currentRate$ | async }} USD</p>
