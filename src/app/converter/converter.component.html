@@ -1,0 +1,22 @@
+<div layout="row" layout-wrap>
+  <mat-form-field floatLabel="always">
+    <mat-label>Amount</mat-label>
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="amount"
+      (change)="updateConvertedAmount()"
+      class="example-right-align"
+      placeholder="0"
+    />
+    <span matTextPrefix>$&nbsp;</span>
+    <span matTextSuffix>.00</span>
+  </mat-form-field>
+
+  <div>
+    Converted Amount USD:
+    {{ convertedAmount.toFixed(2) }}
+  </div>
+</div>
+
+<p>Current exchange rate: 1 EUR = {{ currentRate$ | async }} USD</p>
